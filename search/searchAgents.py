@@ -485,7 +485,23 @@ class ClosestDotSearchAgent(SearchAgent):
         problem = AnyFoodSearchProblem(gameState)
 
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        # Using BFS to find the closet food cell.
+        actions = {}
+        frontier = util.Queue()
+        frontier.push(problem.getStartState())
+        explored = set()
+        actions[startPosition] = []
+        explored.add(startPosition)
+        while not frontier.isEmpty():
+            state = frontier.pop()
+            if problem.isGoalState(state):
+                return actions[state]
+            for s in problem.getSuccessors(state):
+                if s[0] not in explored:
+                    frontier.push(s[0])
+                    actions[s[0]] = actions[state] + [s[1]]
+                    explored.add(s[0])
+        return gameState[1]
 
 class AnyFoodSearchProblem(PositionSearchProblem):
     """
@@ -521,7 +537,10 @@ class AnyFoodSearchProblem(PositionSearchProblem):
         x,y = state
 
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        # Goal state if the cell contains food.
+        return self.food[x][y]
+            
+        
 
 def mazeDistance(point1, point2, gameState):
     """
