@@ -37,6 +37,7 @@ Good luck and happy searching!
 from game import Directions
 from game import Agent
 from game import Actions
+from util import manhattanDistance
 import util
 import time
 import search
@@ -452,9 +453,19 @@ def foodHeuristic(state, problem):
     Subsequent calls to this heuristic can access
     problem.heuristicInfo['wallCount']
     """
-    position, foodGrid = state
+    start, foodGrid = state
     "*** YOUR CODE HERE ***"
-    return 0
+    food = foodGrid.asList()
+    
+    # Find the most distant food cells f1, f2
+    # The cost would be the min path going through pos, f1, f2
+    minDistFromStart = lambda f1, f2: min(manhattanDistance(start, f1), manhattanDistance(start, f2))
+    totalDistance = lambda f1, f2: manhattanDistance(f1, f2) + minDistFromStart(f1, f2)
+    d = 0
+    for f1 in food:
+        d = max(d, max(totalDistance(f1, f2) for f2 in food))
+
+    return d
 
 class ClosestDotSearchAgent(SearchAgent):
     "Search for all food using a sequence of searches"
