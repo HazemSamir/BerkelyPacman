@@ -490,29 +490,12 @@ class ClosestDotSearchAgent(SearchAgent):
         gameState.
         """
         # Here are some useful elements of the startState
-        startPosition = gameState.getPacmanPosition()
-        food = gameState.getFood()
-        walls = gameState.getWalls()
         problem = AnyFoodSearchProblem(gameState)
 
         "*** YOUR CODE HERE ***"
         # Using BFS to find the closet food cell.
-        actions = {}
-        frontier = util.Queue()
-        frontier.push(problem.getStartState())
-        explored = set()
-        actions[startPosition] = []
-        explored.add(startPosition)
-        while not frontier.isEmpty():
-            state = frontier.pop()
-            if problem.isGoalState(state):
-                return actions[state]
-            for s in problem.getSuccessors(state):
-                if s[0] not in explored:
-                    frontier.push(s[0])
-                    actions[s[0]] = actions[state] + [s[1]]
-                    explored.add(s[0])
-        return gameState[1]
+        # TODO try iterative deeping search
+        return search.bfs(problem)
 
 class AnyFoodSearchProblem(PositionSearchProblem):
     """
