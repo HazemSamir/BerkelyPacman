@@ -296,14 +296,17 @@ class CornersProblem(search.SearchProblem):
         space)
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        return (self.startingPosition, ())
 
     def isGoalState(self, state):
         """
         Returns whether this search state is a goal state of the problem.
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        for c in self.corners:
+            if c not in state[1]:
+                return False
+        return True
 
     def getSuccessors(self, state):
         """
@@ -326,6 +329,15 @@ class CornersProblem(search.SearchProblem):
             #   hitsWall = self.walls[nextx][nexty]
 
             "*** YOUR CODE HERE ***"
+            x, y = state[0]
+            dx, dy = Actions.directionToVector(action)
+            nextx, nexty = int(x + dx), int(y + dy)
+            if not self.walls[nextx][nexty]:
+                testCorners = state[1]
+                if (nextx, nexty) in self.corners and (nextx, nexty) not in testCorners:
+                    testCorners += ((nextx, nexty),)
+                successor = ((nextx, nexty), testCorners)
+                successors.append((successor, action, 1))
 
         self._expanded += 1 # DO NOT CHANGE
         return successors
@@ -361,7 +373,14 @@ def cornersHeuristic(state, problem):
     walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
 
     "*** YOUR CODE HERE ***"
-    return 0 # Default to trivial solution
+    h = 0
+    start = state[0]
+    remainingCorners = set(corners) - set(state[1])
+    while (len(remainingCorners) != 0):
+        s, start = min((abs(start[0] - c[0]) + abs(start[1] - c[1]), c) for c in remainingCorners)
+        h += s
+        remainingCorners -= set([start])
+    return h  # Default to trivial solution
 
 class AStarCornersAgent(SearchAgent):
     "A SearchAgent for FoodSearchProblem using A* and your foodHeuristic"
@@ -497,22 +516,7 @@ class ClosestDotSearchAgent(SearchAgent):
 
         "*** YOUR CODE HERE ***"
         # Using BFS to find the closet food cell.
-        actions = {}
-        frontier = util.Queue()
-        frontier.push(problem.getStartState())
-        explored = set()
-        actions[startPosition] = []
-        explored.add(startPosition)
-        while not frontier.isEmpty():
-            state = frontier.pop()
-            if problem.isGoalState(state):
-                return actions[state]
-            for s in problem.getSuccessors(state):
-                if s[0] not in explored:
-                    frontier.push(s[0])
-                    actions[s[0]] = actions[state] + [s[1]]
-                    explored.add(s[0])
-        return gameState[1]
+        return search.breadthFirstSearch(problem)
 
 class AnyFoodSearchProblem(PositionSearchProblem):
     """
