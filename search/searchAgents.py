@@ -490,9 +490,9 @@ def foodHeuristic(state, problem):
     start, foodGrid = state
     "*** YOUR CODE HERE ***"
     food = foodGrid.asList()
-    
+
     # Find the most distant food cells f1, f2
-    # The cost would be the min path going through pos, f1, f2
+    # The cost would be the min path going through start, f1, f2
     minDistFromStart = lambda f1, f2: min(manhattanDistance(start, f1), manhattanDistance(start, f2))
     totalDistance = lambda f1, f2: manhattanDistance(f1, f2) + minDistFromStart(f1, f2)
     d = 0
