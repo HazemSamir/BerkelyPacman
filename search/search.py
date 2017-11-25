@@ -87,19 +87,26 @@ def depthFirstSearch(problem):
     print "Start's successors:", problem.getSuccessors(problem.getStartState())
     """
     "*** YOUR CODE HERE ***"
+    #   Dictionary to hold a state as a key and the path that led to it
     actions = {}
+    #   A stack to hold the nodes being in the frontier waiting to be explored
     frontier = util.Stack()
     frontier.push(problem.getStartState())
+    #   A set to hold the explored nodes through the algorithm
     explored = set()
     actions[problem.getStartState()] = []
     while not frontier.isEmpty():
+        #   Remove the node being investigated and add it to explored list
         state = frontier.pop()
         explored.add(state)
+        #   Check if the node is a goal state
         if problem.isGoalState(state):
             return actions[state]
+        # Generate state successors
         for s in problem.getSuccessors(state):
             if s[0] not in explored:
                 frontier.push(s[0])
+                # Update the path to successor s
                 actions[s[0]] = actions[state] + [s[1]]
     return actions[state]
 
@@ -110,19 +117,26 @@ def depthFirstSearch(problem):
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
+    #   Dictionary to hold a state as a key and the path that led to it
     actions = {}
+    #   A queue to hold the nodes being in the frontier waiting to be explored
     frontier = util.Queue()
     frontier.push(problem.getStartState())
+    #   A set to hold the explored nodes through the algorithm
     explored = set()
     actions[problem.getStartState()] = []
     explored.add(problem.getStartState())
     while not frontier.isEmpty():
+        #   Remove the node being investigated
         state = frontier.pop()
+        #   Check if the node is a goal state
         if problem.isGoalState(state):
             return actions[state]
+        #   Generate state successors
         for s in problem.getSuccessors(state):
             if s[0] not in explored:
                 frontier.push(s[0])
+                #   Update the path to successor s and add it to explored set
                 actions[s[0]] = actions[state] + [s[1]]
                 explored.add(s[0])
     return state[1]
@@ -130,25 +144,37 @@ def breadthFirstSearch(problem):
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
+    #   Dictionary to hold a state as a key and the path that led to it with the cost
     actions = {}
+    #   A priority queue to hold the nodes being in the frontier waiting to be explored
     frontier = util.PriorityQueue()
     frontier.push(problem.getStartState(), 0)
+    #   A set to hold the explored nodes through the algorithm
     explored = set()
     explored.add(problem.getStartState())
-    actions[problem.getStartState()] = ([],0)
+    actions[problem.getStartState()] = ([], 0)
     while not frontier.isEmpty():
+        #   Remove the node being investigated
         state = frontier.pop()
+        #   Check if the node is a goal state
         if problem.isGoalState(state):
             return actions[state][0]
+        #   Generate state successors
         for s in problem.getSuccessors(state):
+            #   Check that node is not in the explored set nor in the queue
             if s[0] not in explored and s[0] not in [x[2] for x in frontier.heap]:
+                #   Compute priority as the cost from the parent state plus the cost of the successor
                 priority = actions[state][1] + s[2]
                 frontier.push(s[0], priority)
+                #   Update the path and cost to successor s and add it to explored set
                 actions[s[0]] = (actions[state][0] + [s[1]], priority)
                 explored.add(s[0])
+            #   Check if the node is already in the queue
             elif s[0] in [x[2] for x in frontier.heap]:
                 frontier.update(s[0], actions[state][1] + s[2])
+                #   Compute priority as the cost from the parent state plus the cost of the successor
                 priority = actions[state][1] + s[2]
+                #   Update the path and cost if the new cost is smaller
                 if actions[s[0]][1] > priority:
                     actions[s[0]] = (actions[state][0] + [s[1]], priority)
                 explored.add(s[0])
@@ -164,26 +190,39 @@ def nullHeuristic(state, problem=None):
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
+    #   Dictionary to hold a state as a key and the path that led to it with the cost
     actions = {}
+    #   A priority queue to hold the nodes being in the frontier waiting to be explored
     frontier = util.PriorityQueue()
+    #   Compute the heuristic function for start state
     h = heuristic(problem.getStartState(), problem)
     frontier.push(problem.getStartState(), h)
+    #   A set to hold the explored nodes through the algorithm
     explored = set()
     explored.add(problem.getStartState())
     actions[problem.getStartState()] = ([], 0)
     while not frontier.isEmpty():
+        #   Remove the node being investigated
         state = frontier.pop()
+        #   Check if the node is a goal state
         if problem.isGoalState(state):
             return actions[state][0]
+        #   Generate state successors
         for s in problem.getSuccessors(state):
+            #   Compute heuristic for the successor state
             h = heuristic(s[0], problem)
             cost = actions[state][1] + s[2]
+            #   Check that node is not in the explored set nor in the queue
             if s[0] not in explored and s[0] not in [x[2] for x in frontier.heap]:
+                #   Push successor with f = g + h as priority
                 frontier.push(s[0], cost + h)
                 actions[s[0]] = (actions[state][0] + [s[1]], cost)
                 explored.add(s[0])
+            #   Check if the node is already in the queue
             elif s[0] in [x[2] for x in frontier.heap]:
+                #   Update successor with f = g + h as priority
                 frontier.update(s[0], cost + h)
+                #   Update the path if the new cost is smaller
                 if actions[s[0]][1] > cost:
                     actions[s[0]] = (actions[state][0] + [s[1]], cost)
                 explored.add(s[0])

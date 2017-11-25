@@ -296,6 +296,7 @@ class CornersProblem(search.SearchProblem):
         space)
         """
         "*** YOUR CODE HERE ***"
+        #   Return state as pair of node and a tuple holding corner nodes already visited
         return (self.startingPosition, ())
 
     def isGoalState(self, state):
@@ -303,6 +304,7 @@ class CornersProblem(search.SearchProblem):
         Returns whether this search state is a goal state of the problem.
         """
         "*** YOUR CODE HERE ***"
+        #   Check if all corners are in the tuple associated with given state
         for c in self.corners:
             if c not in state[1]:
                 return False
@@ -330,12 +332,16 @@ class CornersProblem(search.SearchProblem):
 
             "*** YOUR CODE HERE ***"
             x, y = state[0]
+            #   Get difference in x, y to compute new point coordinates
             dx, dy = Actions.directionToVector(action)
             nextx, nexty = int(x + dx), int(y + dy)
+            #   Check if the point is not a wall then it's a valid successor
             if not self.walls[nextx][nexty]:
                 testCorners = state[1]
+                #   Check if the successor is a corner and visited by the path so far
                 if (nextx, nexty) in self.corners and (nextx, nexty) not in testCorners:
                     testCorners += ((nextx, nexty),)
+                #   Create successor tuple and append it to the list of successors
                 successor = ((nextx, nexty), testCorners)
                 successors.append((successor, action, 1))
 
@@ -373,10 +379,19 @@ def cornersHeuristic(state, problem):
     walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
 
     "*** YOUR CODE HERE ***"
+    #   Initialize heuristic value
     h = 0
     start = state[0]
+    #   Generate set  of unvisited corners
     remainingCorners = set(corners) - set(state[1])
-    while (len(remainingCorners) != 0):
+    while len(remainingCorners) != 0:
+        '''
+        Get the minimum manhattan distance from the node to all corners and 
+        use that corner with the minimum distance as a start node for the next
+        iteration after removing it from the remaining corners to compute the 
+        minimum distance between it and remaining corners an so on, the heuristic is
+        the sum of all minimum distances computed in every step
+        '''
         s, start = min((abs(start[0] - c[0]) + abs(start[1] - c[1]), c) for c in remainingCorners)
         h += s
         remainingCorners -= set([start])
